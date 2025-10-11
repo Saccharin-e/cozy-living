@@ -1,8 +1,11 @@
 import { defineConfig } from 'vite'
 import adonisjs from '@adonisjs/vite/client'
+import tailwindcss from '@tailwindcss/vite'
 
 export default defineConfig({
   plugins: [
+
+    tailwindcss(), 
     
     adonisjs({
       /**

@@ -4,23 +4,37 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>My Awesome Home Page</title>
-
+  <title>Home Page</title>
+  
   @vite(['resources/js/app.js'])
 </head>
 
 <body>
+  <h1>Welcome to My Home Page</h1>
   <div>
-    <h1>Welcome to My Awesome Home Page</h1>
+    
     <nav>
         <a href="{{ route('home') }}">Home</a>
-        <a href="{{ route('products.show', { slug: 'my-product' }) }}">Products</a>
-        <a href="{{ route('products.show', { slug: 'another-product' }) }}">Another Product</a>
+        <a href="{{ route('products.show', { slug: 'product-1' }) }}">Product</a>
+        <a href="{{ route('products.show', { slug: 'product-2' }) }}">Another Product</a>
+        <a href="{{ route('products.show', { slug: 'product-3' }) }}">Yet Another Product</a>
     </nav>
     <p>This is the best place to find amazing products.</p>
-    <a href="{{ route('products.show', { slug: 'my-product' }) }}">Check out our products</a>
+    <a href="{{ route('products.show', { slug: 'product-1' }) }}">Check out our products</a>
+
+    <ul>
+      @each (product in products)
+        <li>
+          <a href="{{ route('products.show', { slug: product.slug }) }}">
+           {{ product.title }} 
+          </a>
+        </li>
+      @endeach
+    </ul>
+      
+
   </div>
-    
+ 
 </body>
 
 </html>

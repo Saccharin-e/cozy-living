@@ -1,14 +1,14 @@
-@layout({ title: 'About Us - CozyKitchen' })
+@layout({ title: 'About Us - CozyLiving' })
   @slot('meta')
-    <meta name="description" content="Learn about CozyKitchen - Your trusted source for premium kitchen essentials">
+    <meta name="description" content="Learn about CozyLiving - Your trusted source for premium home essentials and appliances">
   @endslot
 
   <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
     {{-- Hero Section --}}
     <div class="text-center mb-16">
-      <h1 class="text-4xl md:text-5xl font-bold text-gray-900 mb-4">About CozyKitchen</h1>
+      <h1 class="text-4xl md:text-5xl font-bold text-gray-900 mb-4">About CozyLiving</h1>
       <p class="text-xl text-gray-600 max-w-3xl mx-auto">
-        Bringing premium kitchen essentials to home chefs who are passionate about creating delicious memories
+        Bringing premium home essentials and appliances to modern homeowners who value quality and comfort
       </p>
     </div>
 
@@ -19,13 +19,13 @@
           <h2 class="text-3xl font-bold text-gray-900 mb-6">Our Story</h2>
           <div class="space-y-4 text-gray-700 leading-relaxed">
             <p>
-              CozyKitchen was born from a simple belief: cooking should be a joyful experience, not a chore. 
-              We understand that the right tools can transform your time in the kitchen from ordinary to extraordinary.
+              CozyLiving was born from a simple belief: your home should be a sanctuary of comfort and style. 
+              We understand that the right products can transform your living space from ordinary to extraordinary.
             </p>
             <p>
-              Founded in 2020, we started as a small family business with a passion for quality kitchenware. 
-              What began in a modest workshop has grown into a trusted brand serving thousands of home chefs 
-              across Indonesia who share our love for cooking and quality.
+              Founded in 2020, we started as a small family business with a passion for quality home products. 
+              What began with kitchen essentials has grown into a comprehensive collection of home appliances and accessories, 
+              serving thousands of homeowners across Indonesia who share our vision for comfortable living.
             </p>
             <p>
               Every product we offer is carefully selected and tested by our team of cooking enthusiasts. 
@@ -37,7 +37,7 @@
         <div class="bg-gradient-to-br from-amber-100 to-amber-50 rounded-2xl p-8 shadow-xl">
           <img 
             src="/images/about-story.jpg" 
-            alt="CozyKitchen Story" 
+            alt="CozyLiving Story" 
             class="rounded-lg shadow-lg w-full object-cover h-full"
             onerror="this.src='https://images.unsplash.com/photo-1556910103-1c02745aae4d?w=600&h=400&fit=crop'; this.onerror=null;"
           />
@@ -97,7 +97,7 @@
 
     {{-- Why Choose Us --}}
     <section class="mb-16 bg-gradient-to-r from-amber-50 to-yellow-50 rounded-2xl p-8 md:p-12">
-      <h2 class="text-3xl font-bold text-gray-900 mb-8 text-center">Why Choose CozyKitchen?</h2>
+      <h2 class="text-3xl font-bold text-gray-900 mb-8 text-center">Why Choose CozyLiving?</h2>
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div class="flex gap-4">
           <div class="flex-shrink-0">
@@ -114,7 +114,7 @@
           </div>
           <div>
             <h3 class="font-bold text-gray-900 mb-2">Expert Curation</h3>
-            <p class="text-gray-700">Every item tested and approved by our culinary team</p>
+            <p class="text-gray-700">Every item tested and approved by our quality assurance team</p>
           </div>
         </div>
         <div class="flex gap-4">
@@ -140,9 +140,9 @@
 
     {{-- Call to Action --}}
     <section class="text-center">
-      <h2 class="text-3xl font-bold text-gray-900 mb-4">Ready to Transform Your Kitchen?</h2>
+      <h2 class="text-3xl font-bold text-gray-900 mb-4">Ready to Transform Your Home?</h2>
       <p class="text-lg text-gray-600 mb-8">
-        Join thousands of home chefs who trust CozyKitchen for their culinary journey
+        Join thousands of homeowners who trust CozyLiving for quality products and exceptional service
       </p>
       <div class="flex flex-col sm:flex-row gap-4 justify-center">
         <a 
@@ -160,6 +160,6 @@
       </div>
     </section>
   </main>
+  @include('partials/footer')
 @end
 
-@include('partials/footer')

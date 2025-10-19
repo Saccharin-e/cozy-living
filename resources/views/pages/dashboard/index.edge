@@ -1,6 +1,6 @@
-@layout({ title: 'Dashboard - CozyKitchen' })
+@layout({ title: 'Dashboard - CozyLiving' })
   @slot('meta')
-    <meta name="description" content="Your CozyKitchen dashboard">
+    <meta name="description" content="Your CozyLiving dashboard">
   @endslot
 
   <main class="min-h-screen bg-gradient-to-br from-amber-50 to-orange-50">
@@ -110,7 +110,7 @@
             </div>
             <div>
               <p class="text-sm text-gray-600">Wishlist</p>
-              <p class="text-2xl font-bold text-gray-900">0</p>
+              <p id="wishlist-count" class="text-2xl font-bold text-gray-900">{{ wishlistCount }}</p>
             </div>
           </div>
         </div>
@@ -124,7 +124,7 @@
             </div>
             <div>
               <p class="text-sm text-gray-600">Orders</p>
-              <p class="text-2xl font-bold text-gray-900">0</p>
+              <p class="text-2xl font-bold text-gray-900">{{ ordersCount }}</p>
             </div>
           </div>
         </div>
@@ -167,4 +167,6 @@
       </div>
     </div>
   </main>
+  
+  @include('partials/footer')
 @end

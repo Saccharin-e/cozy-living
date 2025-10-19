@@ -1,5 +1,15 @@
 import '../css/app.css'
 
+// Helper function to update wishlist counter
+function updateWishlistCounter(increment) {
+  const counterElement = document.getElementById('wishlist-count');
+  if (counterElement) {
+    const currentCount = parseInt(counterElement.textContent) || 0;
+    const newCount = Math.max(0, currentCount + increment);
+    counterElement.textContent = newCount;
+  }
+}
+
 // Wishlist functionality
 window.toggleWishlist = async function(event, slug) {
   event.preventDefault();
@@ -36,6 +46,9 @@ window.toggleWishlist = async function(event, slug) {
         icon.classList.remove('text-red-500');
         icon.classList.add('text-gray-400');
         button.title = 'Add to wishlist';
+        
+        // Update counter (decrement)
+        updateWishlistCounter(-1);
       }
     } else {
       // Add to wishlist
@@ -55,6 +68,9 @@ window.toggleWishlist = async function(event, slug) {
         icon.classList.remove('text-gray-400');
         icon.classList.add('text-red-500');
         button.title = 'Remove from wishlist';
+        
+        // Update counter (increment)
+        updateWishlistCounter(1);
       }
     }
   } catch (error) {

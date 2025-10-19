@@ -1,6 +1,6 @@
-# CozyKitchen Image Assets
+# CozyLiving Image Assets
 
-This folder contains all image assets for the CozyKitchen website. Please add your images with the following names:
+This folder contains all image assets for the CozyLiving website. Please add your images with the following names:
 
 ## Required Images
 

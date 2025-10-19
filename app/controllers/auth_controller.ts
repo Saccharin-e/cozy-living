@@ -46,7 +46,7 @@ export default class AuthController {
       // Automatically log in the user with remember me
       await auth.use('web').login(user, true)
 
-      session.flash('success', `Welcome to CozyKitchen, ${user.fullName}!`)
+      session.flash('success', `Welcome to CozyLiving, ${user.fullName}!`)
       
       // Redirect based on role
       if (user.role === 'seller') {

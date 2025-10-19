@@ -9,9 +9,23 @@ export default class CartController {
   /**
    * Display the shopping cart page
    */
-  async index({ view, session }: HttpContext) {
+  async index({ view, session, auth, logger }: HttpContext) {
+    // Log session info for debugging
+    const sessionId = session.sessionId
+    const userId = auth.user?.id || 'guest'
+    logger.info(`Cart view - Session: ${sessionId}, User: ${userId}`)
+    
     // Get cart items from session (array of { slug, quantity })
-    const cartData = session.get('cart', []) as Array<{ slug: string; quantity: number }>
+    let cartData = session.get('cart', [])
+    
+    // Validate cart is an array (handle corrupted data)
+    if (!Array.isArray(cartData)) {
+      logger.warn(`Cart data is not an array for user ${userId}, resetting to empty array`)
+      cartData = []
+      session.put('cart', [])
+    }
+    
+    logger.info(`Cart items for user ${userId}:`, cartData.length)
 
     // Fetch actual product data
     const cartItemsWithProducts = []
@@ -65,11 +79,13 @@ export default class CartController {
   /**
    * Add item to cart
    */
-  async store({ request, response, session, logger }: HttpContext) {
+  async store({ request, response, session, logger, auth }: HttpContext) {
     try {
       const { slug, quantity = 1 } = request.only(['slug', 'quantity'])
+      const sessionId = session.sessionId
+      const userId = auth.user?.id || 'guest'
       
-      logger.info('Adding to cart - slug:', slug, 'quantity:', quantity)
+      logger.info(`Adding to cart - Session: ${sessionId}, User: ${userId}, slug: ${slug}, quantity: ${quantity}`)
       
       // Validate that slug exists
       if (!slug) {
@@ -80,22 +96,32 @@ export default class CartController {
       }
       
       // Get current cart from session
-      const cart = session.get('cart', []) as Array<{ slug: string; quantity: number }>
+      let cart = session.get('cart', [])
+      
+      // Validate cart is an array
+      if (!Array.isArray(cart)) {
+        logger.warn('Cart data corrupted, resetting to empty array')
+        cart = []
+      }
+      
       logger.info('Current cart items:', cart.length)
       
+      // Type cast cart for type safety
+      const typedCart = cart as Array<{ slug: string; quantity: number }>
+      
       // Check if item already exists
-      const existingItem = cart.find((item) => item.slug === slug)
+      const existingItem = typedCart.find((item) => item.slug === slug)
       
       if (existingItem) {
         existingItem.quantity += Number(quantity)
         logger.info('Updated existing item, new quantity:', existingItem.quantity)
       } else {
-        cart.push({ slug, quantity: Number(quantity) })
+        typedCart.push({ slug, quantity: Number(quantity) })
         logger.info('Added new item to cart')
       }
       
       // Save back to session
-      session.put('cart', cart)
+      session.put('cart', typedCart)
       logger.info('Cart saved to session')
       
       session.flash('success', 'Product added to cart')
@@ -122,19 +148,27 @@ export default class CartController {
       logger.info('Updating cart item - slug:', slug, 'quantity:', quantity)
       
       // Get current cart from session
-      const cart = session.get('cart', []) as Array<{ slug: string; quantity: number }>
-      logger.info('Current cart:', cart)
+      let cart = session.get('cart', [])
+      
+      // Validate cart is an array
+      if (!Array.isArray(cart)) {
+        logger.warn('Cart data corrupted, resetting to empty array')
+        cart = []
+      }
+      
+      const typedCart = cart as Array<{ slug: string; quantity: number }>
+      logger.info('Current cart:', typedCart.length)
       
       // Find and update the item
-      const item = cart.find((item) => item.slug === slug)
+      const item = typedCart.find((item) => item.slug === slug)
       if (item) {
         item.quantity = Number(quantity)
         logger.info('Updated item quantity to:', item.quantity)
         
         // Remove if quantity is 0
         if (item.quantity <= 0) {
-          const index = cart.indexOf(item)
-          cart.splice(index, 1)
+          const index = typedCart.indexOf(item)
+          typedCart.splice(index, 1)
           logger.info('Removed item from cart (quantity was 0)')
         }
       } else {
@@ -142,6 +176,7 @@ export default class CartController {
       }
       
       // Save back to session
+      session.put('cart', typedCart)
       session.put('cart', cart)
       logger.info('Cart updated in session')
       session.flash('success', 'Cart updated')
@@ -166,12 +201,20 @@ export default class CartController {
       logger.info('Removing item from cart - slug:', slug)
       
       // Get current cart from session
-      const cart = session.get('cart', []) as Array<{ slug: string; quantity: number }>
-      logger.info('Current cart:', cart)
+      let cart = session.get('cart', [])
+      
+      // Validate cart is an array
+      if (!Array.isArray(cart)) {
+        logger.warn('Cart data corrupted, resetting to empty array')
+        cart = []
+      }
+      
+      const typedCart = cart as Array<{ slug: string; quantity: number }>
+      logger.info('Current cart:', typedCart.length)
       
       // Filter out the item
-      const updatedCart = cart.filter((item) => item.slug !== slug)
-      logger.info('Updated cart after removal:', updatedCart)
+      const updatedCart = typedCart.filter((item) => item.slug !== slug)
+      logger.info('Updated cart after removal:', updatedCart.length)
       
       // Save back to session
       session.put('cart', updatedCart)

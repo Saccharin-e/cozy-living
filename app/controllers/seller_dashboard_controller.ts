@@ -1,5 +1,6 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import Order from '#models/order'
+import ProductVM from '#view_models/product'
 import db from '@adonisjs/lucid/services/db'
 
 export default class SellerDashboardController {
@@ -69,7 +70,7 @@ export default class SellerDashboardController {
   /**
    * View order details
    */
-  async showOrder({ auth, params, view, response }: HttpContext) {
+  async showOrder({ auth, params, view, response, logger }: HttpContext) {
     auth.getUserOrFail()
 
     const order = await Order.query()
@@ -82,8 +83,40 @@ export default class SellerDashboardController {
       return response.notFound('Order not found')
     }
 
+    // Load product details for each order item (same as user orders)
+    const allProducts = await ProductVM.all()
+    logger.info(`Seller viewing order #${order.id} - Total products available: ${allProducts.length}`)
+    logger.info(`Order items count: ${order.items.length}`)
+    
+    const orderItemsWithProducts = order.items.map(item => {
+      const product = allProducts.find(p => p.slug === item.productSlug.trim())
+      
+      logger.info(`Item slug: ${item.productSlug}, Product found: ${!!product}`)
+      if (product) {
+        logger.info(`Product data: title="${product.title}", image="${product.image}"`)
+      } else {
+        logger.warn(`Product not found for slug: "${item.productSlug}"`)
+      }
+      
+      return {
+        id: item.id,
+        orderId: item.orderId,
+        productSlug: item.productSlug,
+        quantity: item.quantity,
+        price: item.price,
+        product: product ? {
+          slug: product.slug,
+          title: product.title,
+          summary: product.summary,
+          image: product.image,
+          price: product.price
+        } : null
+      }
+    })
+
     return view.render('pages/seller/dashboard/order-details', {
-      order
+      order,
+      orderItems: orderItemsWithProducts
     })
   }
 

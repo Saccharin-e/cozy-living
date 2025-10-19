@@ -1,5 +1,7 @@
 import { HttpContext } from '@adonisjs/core/http'
 import ProductVM from '#view_models/product'
+import Wishlist from '#models/wishlist'
+import Order from '#models/order'
 
 export default class DashboardController {
   /**
@@ -11,9 +13,17 @@ export default class DashboardController {
     // Get all products for display
     const products = await ProductVM.all()
     
+    // Get wishlist count
+    const wishlistCount = await Wishlist.query().where('user_id', user.id).count('* as total')
+    
+    // Get orders count
+    const ordersCount = await Order.query().where('user_id', user.id).count('* as total')
+    
     return view.render('pages/dashboard/index', {
       user,
       products: products.slice(0, 8), // Show only 8 products on dashboard
+      wishlistCount: wishlistCount[0].$extras.total,
+      ordersCount: ordersCount[0].$extras.total,
     })
   }
 

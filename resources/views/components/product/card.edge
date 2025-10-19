@@ -16,7 +16,7 @@
         @endif
         
         {{-- Wishlist Button - Only show for authenticated users --}}
-        @if(auth.user)
+        @if(auth?.isAuthenticated && auth?.user)
           <button 
             onclick="toggleWishlist(event, '{{ product.slug }}')"
             data-slug="{{ product.slug }}"

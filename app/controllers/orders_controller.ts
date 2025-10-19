@@ -24,7 +24,7 @@ export default class OrdersController {
   /**
    * Display order details
    */
-  async show({ auth, params, view, response }: HttpContext) {
+  async show({ auth, params, view, response, logger }: HttpContext) {
     const user = auth.getUserOrFail()
     
     const order = await Order.query()
@@ -39,13 +39,43 @@ export default class OrdersController {
 
     // Load product details for each order item
     const allProducts = await ProductVM.all()
+    logger.info(`Total products available: ${allProducts.length}`)
+    logger.info(`Order items count: ${order.items.length}`)
+    
+    // Log all available product slugs
+    const productSlugs = allProducts.map(p => p.slug)
+    logger.info(`Available product slugs: ${JSON.stringify(productSlugs)}`)
+    
     const orderItemsWithProducts = order.items.map(item => {
-      const product = allProducts.find(p => p.slug === item.productSlug)
+      logger.info(`Looking for product with slug: "${item.productSlug}" (trimmed: "${item.productSlug.trim()}")`)
+      
+      const product = allProducts.find(p => p.slug === item.productSlug.trim())
+      
+      logger.info(`Item slug: ${item.productSlug}, Product found: ${!!product}`)
+      if (product) {
+        logger.info(`Product data: title="${product.title}", image="${product.image}"`)
+      } else {
+        logger.warn(`Product not found for slug: "${item.productSlug}"`)
+      }
+      
       return {
-        ...item.serialize(),
-        product
+        id: item.id,
+        orderId: item.orderId,
+        productSlug: item.productSlug,
+        quantity: item.quantity,
+        price: item.price,
+        product: product ? {
+          slug: product.slug,
+          title: product.title,
+          summary: product.summary,
+          image: product.image,
+          price: product.price
+        } : null
       }
     })
+    
+    logger.info(`Total items with product data: ${orderItemsWithProducts.filter(i => i.product).length}`)
+    logger.info(`Total items without product data: ${orderItemsWithProducts.filter(i => !i.product).length}`)
 
     return view.render('pages/orders/show', {
       order,
@@ -59,9 +89,15 @@ export default class OrdersController {
   async checkout({ auth, view, session, response }: HttpContext) {
     auth.getUserOrFail()
     
-    // Get cart from session
-    const cart = session.get('cart', {})
-    const cartItems = Object.values(cart)
+    // Get cart from session (cart is an array)
+    let cart = session.get('cart', [])
+    
+    // Ensure cart is an array
+    if (!Array.isArray(cart)) {
+      cart = []
+    }
+    
+    const cartItems = cart as Array<{ slug: string; quantity: number }>
 
     if (cartItems.length === 0) {
       session.flash('error', 'Your cart is empty')
@@ -70,7 +106,7 @@ export default class OrdersController {
 
     // Load products for cart items
     const allProducts = await ProductVM.all()
-    const cartItemsWithProducts = cartItems.map((item: any) => {
+    const cartItemsWithProducts = cartItems.map((item) => {
       const product = allProducts.find(p => p.slug === item.slug)
       return {
         ...item,
@@ -92,12 +128,18 @@ export default class OrdersController {
   /**
    * Process checkout and create order
    */
-  async store({ auth, request, session, response }: HttpContext) {
+  async store({ auth, request, session, response, logger }: HttpContext) {
     const user = auth.getUserOrFail()
     
-    // Get cart from session
-    const cart = session.get('cart', {})
-    const cartItems = Object.values(cart)
+    // Get cart from session (cart is an array)
+    let cart = session.get('cart', [])
+    
+    // Ensure cart is an array
+    if (!Array.isArray(cart)) {
+      cart = []
+    }
+    
+    const cartItems = cart as Array<{ slug: string; quantity: number }>
 
     if (cartItems.length === 0) {
       session.flash('error', 'Your cart is empty')
@@ -117,7 +159,7 @@ export default class OrdersController {
     let total = 0
     const orderItemsData: any[] = []
 
-    for (const item of cartItems as any[]) {
+    for (const item of cartItems) {
       const product = allProducts.find(p => p.slug === item.slug)
       if (product) {
         const itemTotal = product.price * item.quantity
@@ -127,6 +169,9 @@ export default class OrdersController {
           quantity: item.quantity,
           price: product.price
         })
+        logger.info(`Order item added: slug="${item.slug}", quantity=${item.quantity}, price=${product.price}`)
+      } else {
+        logger.warn(`Product not found for slug: "${item.slug}"`)
       }
     }
 
@@ -153,8 +198,8 @@ export default class OrdersController {
 
       await trx.commit()
 
-      // Clear cart
-      session.put('cart', {})
+      // Clear cart (cart is an array)
+      session.put('cart', [])
       session.flash('success', 'Order placed successfully!')
 
       return response.redirect().toRoute('orders.show', { id: order.id })

@@ -15,9 +15,41 @@
     <div class="flex items-center justify-between">
       
       {{-- Brand --}}
-      <a href="{{ route('home') }}" class="flex items-center gap-2 group" aria-label="CozyKitchen Home">
-        <span class="text-3xl group-hover:scale-110 transition-transform">🍳</span>
-        <span class="text-xl font-bold text-amber-900 group-hover:text-amber-700 transition-colors">CozyKitchen</span>
+      <a href="{{ route('home') }}" class="flex items-center gap-3 group" aria-label="CozyLiving Home">
+        {{-- Logo SVG --}}
+        <div class="relative">
+          <svg class="w-10 h-10 group-hover:scale-110 transition-transform" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+            {{-- House base --}}
+            <path d="M20 50 L50 25 L80 50 L80 85 L20 85 Z" fill="#D97706" stroke="#92400E" stroke-width="2"/>
+            {{-- Roof --}}
+            <path d="M15 50 L50 20 L85 50 L80 50 L50 25 L20 50 Z" fill="#B45309" stroke="#92400E" stroke-width="2"/>
+            {{-- Door --}}
+            <rect x="42" y="60" width="16" height="25" rx="2" fill="#92400E"/>
+            <circle cx="52" cy="72" r="1.5" fill="#FCD34D"/>
+            {{-- Window left --}}
+            <rect x="28" y="55" width="10" height="10" rx="1" fill="#FEF3C7" stroke="#92400E" stroke-width="1"/>
+            <line x1="28" y1="60" x2="38" y2="60" stroke="#92400E" stroke-width="0.5"/>
+            <line x1="33" y1="55" x2="33" y2="65" stroke="#92400E" stroke-width="0.5"/>
+            {{-- Window right --}}
+            <rect x="62" y="55" width="10" height="10" rx="1" fill="#FEF3C7" stroke="#92400E" stroke-width="1"/>
+            <line x1="62" y1="60" x2="72" y2="60" stroke="#92400E" stroke-width="0.5"/>
+            <line x1="67" y1="55" x2="67" y2="65" stroke="#92400E" stroke-width="0.5"/>
+            {{-- Chimney --}}
+            <rect x="65" y="32" width="8" height="15" fill="#B45309" stroke="#92400E" stroke-width="1.5"/>
+            {{-- Heart accent --}}
+            <path d="M50 42 C48 40, 45 40, 44 42 C43 44, 44 46, 50 50 C56 46, 57 44, 56 42 C55 40, 52 40, 50 42 Z" fill="#EF4444" opacity="0.9"/>
+          </svg>
+          {{-- Subtle glow effect on hover --}}
+          <div class="absolute inset-0 bg-amber-400 rounded-full blur-xl opacity-0 group-hover:opacity-20 transition-opacity -z-10"></div>
+        </div>
+        
+        {{-- Brand Text --}}
+        <div class="flex flex-col">
+          <span class="text-2xl font-bold text-amber-900 group-hover:text-amber-700 transition-colors leading-tight tracking-tight">
+            CozyLiving
+          </span>
+          <span class="text-xs text-amber-700 font-medium -mt-1">Your Home, Your Style</span>
+        </div>
       </a>
 
       {{-- Desktop Navigation --}}
@@ -67,18 +99,35 @@
           </div>
         @endif
         
-        {{-- Cart Button --}}
+        {{-- Cart Button - Desktop --}}
         <a 
           href="{{ route('cart.index') }}" 
-          class="hidden sm:flex items-center gap-2 px-4 py-2 bg-amber-600 text-white font-semibold rounded-lg hover:bg-amber-700 shadow-sm transition-all relative"
+          class="hidden sm:flex items-center justify-center gap-2 px-4 py-2 bg-amber-600 text-white font-semibold rounded-lg hover:bg-amber-700 shadow-sm transition-all relative"
           aria-label="Shopping cart with {{ cartCount || 0 }} items"
         >
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
           </svg>
+          <span>Cart</span>
           @if(cartCount > 0)
             <span class="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full h-6 w-6 flex items-center justify-center">
               {{ cartCount > 99 ? '99+' : cartCount }}
+            </span>
+          @endif
+        </a>
+
+        {{-- Cart Button - Mobile (Icon Only) --}}
+        <a 
+          href="{{ route('cart.index') }}" 
+          class="sm:hidden flex items-center justify-center w-10 h-10 bg-amber-600 text-white rounded-lg hover:bg-amber-700 shadow-sm transition-all relative"
+          aria-label="Shopping cart with {{ cartCount || 0 }} items"
+        >
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+          </svg>
+          @if(cartCount > 0)
+            <span class="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
+              {{ cartCount > 9 ? '9+' : cartCount }}
             </span>
           @endif
         </a>
@@ -144,18 +193,6 @@
                   </a>
                 </div>
               @endif
-              
-              <div class="pt-2 border-t border-amber-100">
-                <a 
-                  href="{{ route('cart.index') }}" 
-                  class="w-full flex items-center justify-between px-4 py-3 bg-amber-600 text-white font-semibold rounded-lg hover:bg-amber-700 transition-colors"
-                >
-                  <span>🛒 Cart</span>
-                  @if(cartCount > 0)
-                    <span class="px-2 py-1 bg-amber-700 rounded-full text-xs">{{ cartCount > 99 ? '99+' : cartCount }}</span>
-                  @endif
-                </a>
-              </div>
             </div>
           </nav>
         </div>

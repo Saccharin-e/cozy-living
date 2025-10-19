@@ -4,12 +4,42 @@
       
       {{-- About Section --}}
       <div>
-        <h3 class="text-xl font-bold mb-4 flex items-center gap-2">
-          <span class="text-3xl">🍳</span>
-          CozyKitchen
-        </h3>
+        <div class="mb-4">
+          <a href="{{ route('home') }}" class="inline-flex items-center gap-3 group">
+            {{-- Logo SVG - Footer version with light colors --}}
+            <svg class="w-12 h-12 group-hover:scale-110 transition-transform" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+              {{-- House base --}}
+              <path d="M20 50 L50 25 L80 50 L80 85 L20 85 Z" fill="#FCD34D" stroke="#FEF3C7" stroke-width="2"/>
+              {{-- Roof --}}
+              <path d="M15 50 L50 20 L85 50 L80 50 L50 25 L20 50 Z" fill="#FBBF24" stroke="#FEF3C7" stroke-width="2"/>
+              {{-- Door --}}
+              <rect x="42" y="60" width="16" height="25" rx="2" fill="#B45309"/>
+              <circle cx="52" cy="72" r="1.5" fill="#FEF3C7"/>
+              {{-- Window left --}}
+              <rect x="28" y="55" width="10" height="10" rx="1" fill="#FFFBEB" stroke="#D97706" stroke-width="1"/>
+              <line x1="28" y1="60" x2="38" y2="60" stroke="#D97706" stroke-width="0.5"/>
+              <line x1="33" y1="55" x2="33" y2="65" stroke="#D97706" stroke-width="0.5"/>
+              {{-- Window right --}}
+              <rect x="62" y="55" width="10" height="10" rx="1" fill="#FFFBEB" stroke="#D97706" stroke-width="1"/>
+              <line x1="62" y1="60" x2="72" y2="60" stroke="#D97706" stroke-width="0.5"/>
+              <line x1="67" y1="55" x2="67" y2="65" stroke="#D97706" stroke-width="0.5"/>
+              {{-- Chimney --}}
+              <rect x="65" y="32" width="8" height="15" fill="#FBBF24" stroke="#FEF3C7" stroke-width="1.5"/>
+              {{-- Heart accent --}}
+              <path d="M50 42 C48 40, 45 40, 44 42 C43 44, 44 46, 50 50 C56 46, 57 44, 56 42 C55 40, 52 40, 50 42 Z" fill="#EF4444" opacity="0.95"/>
+            </svg>
+            
+            {{-- Brand Text --}}
+            <div class="flex flex-col">
+              <span class="text-2xl font-bold text-white group-hover:text-amber-100 transition-colors leading-tight">
+                CozyLiving
+              </span>
+              <span class="text-xs text-amber-200 font-medium -mt-1">Your Home, Your Style</span>
+            </div>
+          </a>
+        </div>
         <p class="text-amber-100 mb-4 leading-relaxed">
-          Premium kitchen essentials for home chefs who love to create. Cook Better, Live Cozy.
+          Premium home essentials and appliances for modern living. Transform your house into a home.
         </p>
         <div class="flex gap-3">
           <a href="#" class="w-10 h-10 bg-amber-700 hover:bg-amber-600 rounded-full flex items-center justify-center transition">
@@ -60,13 +90,13 @@
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
             </svg>
-            <span>123 Kitchen Street, Culinary District, Jakarta 12345</span>
+            <span>123 Home Plaza, Living District, Jakarta 12345</span>
           </li>
           <li class="flex items-center gap-2">
             <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
             </svg>
-            <span>hello@cozykitchen.com</span>
+            <span>hello@cozyliving.com</span>
           </li>
           <li class="flex items-center gap-2">
             <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -80,7 +110,7 @@
 
     {{-- Bottom Bar --}}
     <div class="border-t border-amber-700 mt-8 pt-8 text-center text-amber-100">
-      <p>&copy; 2025 CozyKitchen. All rights reserved. Cook Better, Live Cozy.</p>
+      <p>&copy; 2025 CozyLiving. All rights reserved. Live Better, Live Cozy.</p>
     </div>
   </div>
 </footer>

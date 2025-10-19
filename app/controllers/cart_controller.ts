@@ -1,0 +1,190 @@
+import type { HttpContext } from '@adonisjs/core/http'
+import ProductService from '#services/product_service'
+
+/**
+ * CartController handles shopping cart operations
+ * Following SRP: Only responsible for cart-related HTTP requests
+ */
+export default class CartController {
+  /**
+   * Display the shopping cart page
+   */
+  async index({ view, session }: HttpContext) {
+    // Get cart items from session (array of { slug, quantity })
+    const cartData = session.get('cart', []) as Array<{ slug: string; quantity: number }>
+
+    // Fetch actual product data
+    const cartItemsWithProducts = []
+
+    for (const cartItem of cartData) {
+      try {
+        const product = await ProductService.read(cartItem.slug)
+        if (product) {
+          cartItemsWithProducts.push({
+            id: cartItem.slug,
+            slug: cartItem.slug,
+            name: product.frontmatter.title,
+            summary: product.frontmatter.summary,
+            image: product.frontmatter.image || `https://images.unsplash.com/photo-1556911220-bff31c812dba?w=800&h=800&fit=crop&q=80`,
+            price: product.frontmatter.price,
+            quantity: cartItem.quantity,
+          })
+        }
+      } catch (error) {
+        // Skip items that can't be loaded
+        continue
+      }
+    }
+
+    // Group items by vendor (for now, all items are from "Cozy Kitchen")
+    const cartItems = [
+      {
+        vendor: 'Cozy Kitchen',
+        items: cartItemsWithProducts,
+      },
+    ]
+
+    // Calculate totals
+    let totalItems = 0
+    let subtotal = 0
+    
+    for (const item of cartItemsWithProducts) {
+      totalItems += item.quantity
+      subtotal += item.price * item.quantity
+    }
+
+    const summary = {
+      totalItems,
+      subtotal,
+      total: subtotal,
+    }
+
+    return view.render('pages/cart/index', { cartItems, summary })
+  }
+
+  /**
+   * Add item to cart
+   */
+  async store({ request, response, session, logger }: HttpContext) {
+    try {
+      const { slug, quantity = 1 } = request.only(['slug', 'quantity'])
+      
+      logger.info('Adding to cart - slug:', slug, 'quantity:', quantity)
+      
+      // Validate that slug exists
+      if (!slug) {
+        logger.warn('No slug provided')
+        session.flash('error', 'Product slug is required')
+        const referer = request.header('referer') || '/products'
+        return response.redirect(referer)
+      }
+      
+      // Get current cart from session
+      const cart = session.get('cart', []) as Array<{ slug: string; quantity: number }>
+      logger.info('Current cart items:', cart.length)
+      
+      // Check if item already exists
+      const existingItem = cart.find((item) => item.slug === slug)
+      
+      if (existingItem) {
+        existingItem.quantity += Number(quantity)
+        logger.info('Updated existing item, new quantity:', existingItem.quantity)
+      } else {
+        cart.push({ slug, quantity: Number(quantity) })
+        logger.info('Added new item to cart')
+      }
+      
+      // Save back to session
+      session.put('cart', cart)
+      logger.info('Cart saved to session')
+      
+      session.flash('success', 'Product added to cart')
+      
+      const referer = request.header('referer') || '/products'
+      return response.redirect(referer)
+    } catch (error) {
+      logger.error('Error adding to cart:', error)
+      session.flash('error', 'Failed to add product to cart')
+      
+      const referer = request.header('referer') || '/products'
+      return response.redirect(referer)
+    }
+  }
+
+  /**
+   * Update cart item quantity
+   */
+  async update({ params, request, response, session, logger }: HttpContext) {
+    try {
+      const { slug } = params
+      const { quantity } = request.only(['quantity'])
+      
+      logger.info('Updating cart item - slug:', slug, 'quantity:', quantity)
+      
+      // Get current cart from session
+      const cart = session.get('cart', []) as Array<{ slug: string; quantity: number }>
+      logger.info('Current cart:', cart)
+      
+      // Find and update the item
+      const item = cart.find((item) => item.slug === slug)
+      if (item) {
+        item.quantity = Number(quantity)
+        logger.info('Updated item quantity to:', item.quantity)
+        
+        // Remove if quantity is 0
+        if (item.quantity <= 0) {
+          const index = cart.indexOf(item)
+          cart.splice(index, 1)
+          logger.info('Removed item from cart (quantity was 0)')
+        }
+      } else {
+        logger.warn('Item not found in cart:', slug)
+      }
+      
+      // Save back to session
+      session.put('cart', cart)
+      logger.info('Cart updated in session')
+      session.flash('success', 'Cart updated')
+      
+      const referer = request.header('referer') || '/cart'
+      return response.redirect(referer)
+    } catch (error) {
+      logger.error('Error updating cart:', error)
+      session.flash('error', 'Failed to update cart')
+      const referer = request.header('referer') || '/cart'
+      return response.redirect(referer)
+    }
+  }
+
+  /**
+   * Remove item from cart
+   */
+  async destroy({ params, request, response, session, logger }: HttpContext) {
+    try {
+      const { slug } = params
+      
+      logger.info('Removing item from cart - slug:', slug)
+      
+      // Get current cart from session
+      const cart = session.get('cart', []) as Array<{ slug: string; quantity: number }>
+      logger.info('Current cart:', cart)
+      
+      // Filter out the item
+      const updatedCart = cart.filter((item) => item.slug !== slug)
+      logger.info('Updated cart after removal:', updatedCart)
+      
+      // Save back to session
+      session.put('cart', updatedCart)
+      logger.info('Cart saved to session')
+      session.flash('success', 'Item removed from cart')
+      
+      const referer = request.header('referer') || '/cart'
+      return response.redirect(referer)
+    } catch (error) {
+      logger.error('Error removing item from cart:', error)
+      session.flash('error', 'Failed to remove item')
+      const referer = request.header('referer') || '/cart'
+      return response.redirect(referer)
+    }
+  }
+}

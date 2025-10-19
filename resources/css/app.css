@@ -1,11 +1,5 @@
 @import "tailwindcss";
-@source "../views";
-
-
-* {
-  margin: 0;
-  padding: 0;
-}
+@source "../../resources/views/**/*.edge";
 
 html, 
 body {
@@ -13,11 +7,5 @@ body {
   width: 100%;
 }
 
-h1 {
-  @apply text-3xl max-w-3xl mx-auto font-bold mt-6 mb-2;
-}
 
-div {
-  @apply max-w-3xl mx-auto mt-6;
-}
 

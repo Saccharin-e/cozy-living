@@ -7,6 +7,7 @@ export default class RedisController {
         return response.redirect().back()
     }
     async flush({ response }: HttpContext) {
+        console.log('Flushing Redis DB')
         await cache.flushDb()
         return response.redirect().back()
     }

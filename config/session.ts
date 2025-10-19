@@ -14,9 +14,9 @@ const sessionConfig = defineConfig({
 
   /**
    * Define how long to keep the session data alive without
-   * any activity.
+   * any activity. Set to 7 days for persistent login.
    */
-  age: '2h',
+  age: '7 days',
 
   /**
    * Configuration for session cookie and the
@@ -42,6 +42,9 @@ const sessionConfig = defineConfig({
    */
   stores: {
     cookie: stores.cookie(),
+    redis: stores.redis({
+      connection: 'main',
+    }),
   },
 })
 

@@ -1,0 +1,69 @@
+@let(className = 'rounded-lg overflow-hidden border border-slate-200/60 bg-white text-slate-700 shadow-sm hover:shadow-lg transition-shadow h-full flex flex-col')
+
+<div {{$props.merge({class: [className]}).except(['product']).toAttrs()}}>
+    <a href="{{ route('products.show', { slug: product.slug }) }}" class="relative block bg-gray-100">
+        <img 
+          src="{{ product.image }}" 
+          alt="{{ product.title }}" 
+          class="w-full h-56 sm:h-64 lg:h-72 xl:h-80 object-cover hover:scale-105 transition-transform duration-300"
+          loading="lazy"
+          onerror="this.src='https://images.unsplash.com/photo-1556911220-bff31c812dba?w=800&h=800&fit=crop&q=80'; this.onerror=null;"
+        />
+        @if(product.category)
+          <span class="absolute top-3 left-3 px-3 py-1 bg-amber-600 text-white text-xs font-semibold rounded-full shadow-md">
+            {{ product.category }}
+          </span>
+        @endif
+        
+        {{-- Wishlist Button - Only show for authenticated users --}}
+        @if(auth.user)
+          <button 
+            onclick="toggleWishlist(event, '{{ product.slug }}')"
+            data-slug="{{ product.slug }}"
+            class="wishlist-btn absolute top-3 right-3 p-2 bg-white/90 backdrop-blur-sm rounded-full shadow-md hover:bg-white hover:scale-110 transition-all duration-200"
+            title="Add to wishlist"
+          >
+            <svg class="w-5 h-5 text-gray-400 wishlist-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+            </svg>
+          </button>
+        @endif
+    </a>
+    <div class="p-5 sm:p-6 lg:p-8 flex-1 flex flex-col">
+        <h2 class="mb-3 text-lg sm:text-xl lg:text-2xl font-bold leading-tight line-clamp-2">
+            {{product.title}}
+        </h2>
+        <p class="mb-4 text-sm sm:text-base lg:text-lg text-neutral-500 line-clamp-3 flex-1">
+            {{product.summary}}
+        </p>
+        
+        {{-- Price --}}
+        <div class="mb-4">
+          <span class="text-2xl sm:text-3xl font-bold text-amber-600">
+            ${{ product.price.toFixed(2) }}
+          </span>
+        </div>
+        
+        {{-- Action Buttons Stacked --}}
+        <div class="flex flex-col gap-3 mt-auto">
+          <form action="/cart" method="POST" class="w-full">
+            {{ csrfField() }}
+            <input type="hidden" name="slug" value="{{ product.slug }}" />
+            <input type="hidden" name="quantity" value="1" />
+            <button 
+              type="submit" 
+              class="w-full px-6 py-3 bg-amber-600 hover:bg-amber-700 text-white text-base sm:text-lg font-semibold rounded-lg transition shadow-sm hover:shadow-md"
+            >
+              Add to Cart
+            </button>
+          </form>
+          
+          <a 
+            href="{{ route('products.show', { slug: product.slug }) }}" 
+            class="w-full px-6 py-3 border-2 border-amber-600 text-amber-600 hover:bg-amber-50 text-base sm:text-lg font-semibold rounded-lg transition inline-flex items-center justify-center"
+          >
+            View Product
+          </a>
+        </div>
+    </div>
+</div>

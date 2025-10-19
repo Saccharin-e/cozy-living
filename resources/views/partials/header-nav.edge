@@ -1,0 +1,165 @@
+{{-- Navigation Links Data --}}
+@let(navLinks = [
+  { name: 'Home', href: route('home') },
+  { name: 'Products', href: route('products.index') },
+  { name: 'About', href: route('about') },
+  { name: 'Contact', href: route('contact') }
+])
+
+{{-- Reusable Classes --}}
+@let(navLinkClass = 'px-4 py-2 text-sm font-medium text-amber-900 hover:bg-amber-100 rounded-lg transition-colors')
+@let(mobileNavLinkClass = 'block px-4 py-3 text-base font-medium text-amber-900 hover:bg-amber-50 rounded-lg transition-colors')
+
+<header class="sticky top-0 z-50 bg-gradient-to-r from-amber-50 via-yellow-50 to-amber-50 border-b-2 border-amber-200 shadow-sm backdrop-blur-sm">
+  <div class="max-w-7xl mx-auto px-4 py-3 sm:px-6 lg:px-8">
+    <div class="flex items-center justify-between">
+      
+      {{-- Brand --}}
+      <a href="{{ route('home') }}" class="flex items-center gap-2 group" aria-label="CozyKitchen Home">
+        <span class="text-3xl group-hover:scale-110 transition-transform">🍳</span>
+        <span class="text-xl font-bold text-amber-900 group-hover:text-amber-700 transition-colors">CozyKitchen</span>
+      </a>
+
+      {{-- Desktop Navigation --}}
+      <nav class="hidden md:flex items-center space-x-1" aria-label="Main navigation">
+        @each(link in navLinks)
+          <a href="{{ link.href }}" class="{{ navLinkClass }}">{{ link.name }}</a>
+        @end
+      </nav>
+
+      {{-- Actions --}}
+      <div class="flex items-center gap-3">
+        
+        {{-- User Menu --}}
+        @if(auth?.isAuthenticated && auth?.user)
+          <div class="hidden md:flex items-center gap-2">
+            <span class="text-sm text-gray-600">{{ auth.user?.fullName || 'User' }}</span>
+            <a href="{{ route('wishlist.index') }}" class="px-3 py-2 text-sm font-medium text-amber-900 hover:bg-amber-100 rounded-lg" title="My Wishlist">
+              ❤️ Wishlist
+            </a>
+            <a href="{{ route('orders.index') }}" class="px-3 py-2 text-sm font-medium text-amber-900 hover:bg-amber-100 rounded-lg" title="My Orders">
+              📦 Orders
+            </a>
+            @if(auth.user?.role === 'seller')
+              <a href="{{ route('seller.dashboard.index') }}" class="px-3 py-2 text-sm font-medium text-amber-900 hover:bg-amber-100 rounded-lg">
+                📊 Dashboard
+              </a>
+            @else
+              <a href="{{ route('dashboard.index') }}" class="px-3 py-2 text-sm font-medium text-amber-900 hover:bg-amber-100 rounded-lg">
+                📊 Dashboard
+              </a>
+            @endif
+            <form action="{{ route('logout') }}" method="POST" class="inline">
+              {{ csrfField() }}
+              <button type="submit" class="px-3 py-2 text-sm font-medium text-red-600 hover:bg-red-50 rounded-lg">
+                Logout
+              </button>
+            </form>
+          </div>
+        @else
+          <div class="hidden md:flex items-center gap-2">
+            <a href="{{ route('login') }}" class="px-4 py-2 text-sm font-medium text-amber-900 hover:bg-amber-100 rounded-lg">
+              Login
+            </a>
+            <a href="{{ route('register') }}" class="px-4 py-2 bg-amber-600 text-white font-semibold rounded-lg hover:bg-amber-700">
+              Register
+            </a>
+          </div>
+        @endif
+        
+        {{-- Cart Button --}}
+        <a 
+          href="{{ route('cart.index') }}" 
+          class="hidden sm:flex items-center gap-2 px-4 py-2 bg-amber-600 text-white font-semibold rounded-lg hover:bg-amber-700 shadow-sm transition-all relative"
+          aria-label="Shopping cart with {{ cartCount || 0 }} items"
+        >
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+          </svg>
+          @if(cartCount > 0)
+            <span class="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full h-6 w-6 flex items-center justify-center">
+              {{ cartCount > 99 ? '99+' : cartCount }}
+            </span>
+          @endif
+        </a>
+
+        {{-- Mobile Menu Toggle --}}
+        <div class="md:hidden">
+          <input type="checkbox" id="mobile-menu-toggle" class="peer hidden" aria-hidden="true" />
+          <label 
+            for="mobile-menu-toggle" 
+            class="flex items-center justify-center w-10 h-10 rounded-lg bg-amber-100 hover:bg-amber-200 cursor-pointer transition-colors"
+            aria-label="Toggle menu"
+          >
+            <svg class="w-6 h-6 text-amber-900 peer-checked:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+            <svg class="hidden peer-checked:block w-6 h-6 text-amber-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </label>
+
+          {{-- Mobile Dropdown --}}
+          <nav class="peer-checked:block hidden absolute top-full left-0 right-0 bg-white border-t border-amber-200 shadow-lg" aria-label="Mobile navigation">
+            <div class="max-w-7xl mx-auto px-4 py-4 space-y-1">
+              @each(link in navLinks)
+                <a href="{{ link.href }}" class="{{ mobileNavLinkClass }}">{{ link.name }}</a>
+              @end
+              
+              {{-- Mobile Auth Menu --}}
+              @if(auth?.isAuthenticated && auth?.user)
+                <div class="pt-2 border-t border-amber-100 space-y-1">
+                  <div class="px-4 py-2 text-sm text-gray-600 font-medium">
+                    {{ auth.user?.fullName || 'User' }}
+                  </div>
+                  <a href="{{ route('wishlist.index') }}" class="{{ mobileNavLinkClass }}">
+                    ❤️ Wishlist
+                  </a>
+                  <a href="{{ route('orders.index') }}" class="{{ mobileNavLinkClass }}">
+                    📦 Orders
+                  </a>
+                  @if(auth.user?.role === 'seller')
+                    <a href="{{ route('seller.dashboard.index') }}" class="{{ mobileNavLinkClass }}">
+                      📊 Dashboard
+                    </a>
+                  @else
+                    <a href="{{ route('dashboard.index') }}" class="{{ mobileNavLinkClass }}">
+                      📊 Dashboard
+                    </a>
+                  @endif
+                  <form action="{{ route('logout') }}" method="POST">
+                    {{ csrfField() }}
+                    <button type="submit" class="w-full text-left px-4 py-3 text-base font-medium text-red-600 hover:bg-red-50 rounded-lg transition-colors">
+                      🚪 Logout
+                    </button>
+                  </form>
+                </div>
+              @else
+                <div class="pt-2 border-t border-amber-100 space-y-1">
+                  <a href="{{ route('login') }}" class="{{ mobileNavLinkClass }}">
+                    🔐 Login
+                  </a>
+                  <a href="{{ route('register') }}" class="block px-4 py-3 text-base font-medium text-white bg-amber-600 hover:bg-amber-700 rounded-lg transition-colors text-center">
+                    ✨ Register
+                  </a>
+                </div>
+              @endif
+              
+              <div class="pt-2 border-t border-amber-100">
+                <a 
+                  href="{{ route('cart.index') }}" 
+                  class="w-full flex items-center justify-between px-4 py-3 bg-amber-600 text-white font-semibold rounded-lg hover:bg-amber-700 transition-colors"
+                >
+                  <span>🛒 Cart</span>
+                  @if(cartCount > 0)
+                    <span class="px-2 py-1 bg-amber-700 rounded-full text-xs">{{ cartCount > 99 ? '99+' : cartCount }}</span>
+                  @endif
+                </a>
+              </div>
+            </div>
+          </nav>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
